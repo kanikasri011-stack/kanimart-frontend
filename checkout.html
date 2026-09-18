@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout - KaniMart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>📋 Checkout Details</h1>
+
+    <form id="checkoutForm" onsubmit="placeOrder(event)">
+        <h3>Shipping Address</h3>
+        
+        <label>Full Name:</label><br>
+        <input type="text" id="custName" required placeholder="Enter your name"><br><br>
+
+        <label>Phone Number:</label><br>
+        <input type="tel" id="custPhone" required placeholder="Enter mobile number"><br><br>
+
+        <label>Delivery Address:</label><br>
+        <textarea id="custAddress" required placeholder="Enter full address"></textarea><br><br>
+
+        <h3>Payment Method</h3>
+        <select id="paymentMethod">
+            <option value="COD">Cash on Delivery</option>
+            <option value="UPI">UPI / GPay</option>
+        </select><br><br>
+
+        <button type="submit" style="background-color: #007bff; color: white;">Place Order 📦</button>
+        <button type="button" onclick="backToCart()">Back to Cart</button>
+    </form>
+
+    <script>
+        function placeOrder(event) {
+            event.preventDefault(); // Page refresh ஆகாம தடுக்கும்
+
+            let name = document.getElementById("custName").value;
+            let phone = document.getElementById("custPhone").value;
+            let address = document.getElementById("custAddress").value;
+            let payment = document.getElementById("paymentMethod").value;
+
+            // Customer விவரங்களை localStorage-ல சேமிக்கிறோம்
+            let orderDetails = {
+                customerName: name,
+                phone: phone,
+                address: address,
+                paymentMethod: payment,
+                orderDate: new Date().toLocaleDateString()
+            };
+
+            localStorage.setItem("lastOrder", JSON.stringify(orderDetails));
+
+            // Order போட்டாச்சு, அடுத்து Order Success page-க்கு போகும்
+            alert("Order Placed Successfully!");
+            window.location.href = "order-success.html";
+        }
+
+        function backToCart() {
+            window.location.href = "cart.html";
+        }
+    </script>
+</body>
+</html>

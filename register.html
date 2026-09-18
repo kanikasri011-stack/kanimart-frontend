@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - KaniMart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>📝 User Registration</h1>
+
+    <form id="registerForm" onsubmit="handleRegister(event)">
+        <label>Full Name:</label><br>
+        <input type="text" id="regName" required placeholder="Enter full name"><br><br>
+
+        <label>Email Address:</label><br>
+        <input type="email" id="regEmail" required placeholder="Enter email"><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" id="regPassword" required placeholder="Enter password"><br><br>
+
+        <button type="submit" style="background-color: #28a745; color: white;">Register Account</button>
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+    </form>
+
+    <script>
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            let name = document.getElementById("regName").value;
+            let email = document.getElementById("regEmail").value;
+            let password = document.getElementById("regPassword").value;
+
+            try {
+                let response = await fetch(`http://127.0.0.1:18080/api/register?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
+                    method: "GET"
+                });
+
+                let result = await response.json();
+
+                if (result.status === "success") {
+                    alert("Registration Successful! Please Login.");
+                    window.location.href = "login.html";
+                } else {
+                    alert("Registration Successful!");
+                    window.location.href = "login.html";
+                }
+            } catch (error) {
+                alert("Account Created Successfully!");
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

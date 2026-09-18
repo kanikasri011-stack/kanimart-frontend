@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>🛒 Shopping Cart</h1>
+
+    <h2>Total Items: <span id="cartCount">0</span></h2>
+    <h2>Total Price: ₹<span id="totalPrice">0</span></h2>
+
+    <h3>Products in Cart</h3>
+    <ul id="cartItems"></ul>
+
+    <button onclick="goBack()">Continue Shopping</button>
+    <button onclick="clearCart()">Clear Cart</button>
+    <button onclick="goToCheckout()" style="background-color: #28a745; color: white;">Proceed to Checkout ➡️</button>
+
+    <script>
+        let items = JSON.parse(localStorage.getItem("cart")) || [];
+        let list = document.getElementById("cartItems");
+
+        function displayCart() {
+            list.innerHTML = "";
+            let total = 0;
+
+            if (items.length === 0) {
+                list.innerHTML = "<li>Your cart is empty!</li>";
+            } else {
+                items.forEach((item, index) => {
+                    let li = document.createElement("li");
+
+                    let itemName = typeof item === 'object' ? item.name : item;
+                    let itemPrice = typeof item === 'object' ? item.price : getItemPrice(item);
+
+                    total += Number(itemPrice) || 0;
+
+                    li.innerHTML = `
+                        ${itemName} - ₹${itemPrice}
+                        <button onclick="removeItem(${index})">Remove</button>
+                    `;
+
+                    list.appendChild(li);
+                });
+            }
+
+            document.getElementById("cartCount").innerHTML = items.length;
+            document.getElementById("totalPrice").innerHTML = total.toLocaleString('en-IN');
+        }
+
+        function getItemPrice(name) {
+            if (typeof name !== 'string') return 0;
+            let lower = name.toLowerCase();
+            if (lower.includes("laptop")) return 45000;
+            if (lower.includes("mobile")) return 18000;
+            if (lower.includes("headphone")) return 2000;
+            return 0;
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(items));
+            displayCart();
+        }
+
+        function clearCart() {
+            items = [];
+            localStorage.removeItem("cart");
+            displayCart();
+        }
+
+        function goBack() {
+            window.location.href = "products.html";
+        }
+
+        function goToCheckout() {
+            if (items.length === 0) {
+                alert("Your cart is empty! Add some products first.");
+            } else {
+                window.location.href = "checkout.html";
+            }
+        }
+
+        displayCart();
+    </script>
+</body>
+</html>

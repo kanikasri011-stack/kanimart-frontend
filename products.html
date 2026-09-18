@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products - KaniMart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>🛍️ KaniMart Products</h1>
+    
+    <div>
+        <a href="cart.html">🛒 View Cart (<span id="cartCount">0</span>)</a> | 
+        <a href="login.html">Logout</a>
+    </div>
+    <hr>
+
+    <div id="productList" style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+        <p>Loading products...</p>
+    </div>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        document.getElementById("cartCount").innerText = cart.length;
+
+        // Default products if backend server is not running
+        const defaultProducts = [
+            { id: 1, name: "Laptop", price: 45000, stock: 10 },
+            { id: 2, name: "Mobile Phone", price: 18000, stock: 15 },
+            { id: 3, name: "Headphones", price: 2000, stock: 25 },
+            { id: 4, name: "Bread", price: 40, stock: 30 },
+            { id: 5, name: "Butter 500g", price: 250, stock: 20 }
+        ];
+
+        async function loadProducts() {
+            try {
+                let response = await fetch("http://127.0.0.1:18080/api/products");
+                let data = await response.json();
+
+                if (data.status === "success" && data.products.length > 0) {
+                    renderProducts(data.products);
+                } else {
+                    renderProducts(defaultProducts);
+                }
+            } catch (error) {
+                // If C++ Server is offline, show default products smoothly
+                console.log("C++ Backend offline. Loading default items.");
+                renderProducts(defaultProducts);
+            }
+        }
+
+        function renderProducts(products) {
+            let container = document.getElementById("productList");
+            container.innerHTML = "";
+
+            products.forEach(product => {
+                let card = document.createElement("div");
+                card.style.border = "1px solid #ccc";
+                card.style.padding = "15px";
+                card.style.borderRadius = "8px";
+                card.style.width = "200px";
+
+                card.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p><strong>Price:</strong> ₹${product.price}</p>
+                    <button onclick="addToCart('${product.name}', ${product.price})">Add to Cart 🛒</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addToCart(name, price) {
+            cart.push({ name: name, price: price });
+            localStorage.setItem("cart", JSON.stringify(cart));
+            document.getElementById("cartCount").innerText = cart.length;
+            alert(`${name} added to cart!`);
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>
