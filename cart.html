@@ -1,88 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Shopping Cart</title>
+    <title>Your Cart - KaniMart</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>🛒 Shopping Cart</h1>
+    <header style="background-color: #232f3e; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="margin: 0; font-size: 24px;">🛒 KaniMart Cart</h1>
+        <div>
+            <a href="products.html" style="color: white; text-decoration: none; font-weight: bold; margin-right: 15px;">🛍️ Continue Shopping</a>
+            <a href="login.html" style="color: #ff9800; text-decoration: none; font-weight: bold;">Logout</a>
+        </div>
+    </header>
 
-    <h2>Total Items: <span id="cartCount">0</span></h2>
-    <h2>Total Price: ₹<span id="totalPrice">0</span></h2>
+    <main style="max-width: 800px; margin: 30px auto; padding: 0 20px;">
+        <h2>Your Shopping Items</h2>
+        <div id="cartItemsContainer">
+            <p>Loading cart items...</p>
+        </div>
 
-    <h3>Products in Cart</h3>
-    <ul id="cartItems"></ul>
-
-    <button onclick="goBack()">Continue Shopping</button>
-    <button onclick="clearCart()">Clear Cart</button>
-    <button onclick="goToCheckout()" style="background-color: #28a745; color: white;">Proceed to Checkout ➡️</button>
+        <div id="cartSummary" style="margin-top: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; display: none;">
+            <h3>Total Amount: ₹<span id="totalPrice">0</span></h3>
+            <button onclick="checkout()" style="padding: 12px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">Proceed to Checkout 🚀</button>
+            <button onclick="clearCart()" style="padding: 12px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-left: 10px;">Clear Cart 🗑️</button>
+        </div>
+    </main>
 
     <script>
-        let items = JSON.parse(localStorage.getItem("cart")) || [];
-        let list = document.getElementById("cartItems");
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-        function displayCart() {
-            list.innerHTML = "";
-            let total = 0;
+        function renderCart() {
+            let container = document.getElementById("cartItemsContainer");
+            let summary = document.getElementById("cartSummary");
+            let totalPriceEl = document.getElementById("totalPrice");
 
-            if (items.length === 0) {
-                list.innerHTML = "<li>Your cart is empty!</li>";
-            } else {
-                items.forEach((item, index) => {
-                    let li = document.createElement("li");
-
-                    let itemName = typeof item === 'object' ? item.name : item;
-                    let itemPrice = typeof item === 'object' ? item.price : getItemPrice(item);
-
-                    total += Number(itemPrice) || 0;
-
-                    li.innerHTML = `
-                        ${itemName} - ₹${itemPrice}
-                        <button onclick="removeItem(${index})">Remove</button>
-                    `;
-
-                    list.appendChild(li);
-                });
+            if (cart.length === 0) {
+                container.innerHTML = "<p>Your cart is empty! <a href='products.html'>Add some items</a>.</p>";
+                summary.style.display = "none";
+                return;
             }
 
-            document.getElementById("cartCount").innerHTML = items.length;
-            document.getElementById("totalPrice").innerHTML = total.toLocaleString('en-IN');
-        }
+            container.innerHTML = "";
+            let total = 0;
 
-        function getItemPrice(name) {
-            if (typeof name !== 'string') return 0;
-            let lower = name.toLowerCase();
-            if (lower.includes("laptop")) return 45000;
-            if (lower.includes("mobile")) return 18000;
-            if (lower.includes("headphone")) return 2000;
-            return 0;
+            cart.forEach((item, index) => {
+                total += item.price;
+                let card = document.createElement("div");
+                card.style.display = "flex";
+                card.style.justifySpaceBetween = "space-between";
+                card.style.alignItems = "center";
+                card.style.padding = "12px 15px";
+                card.style.borderBottom = "1px solid #eee";
+                card.style.backgroundColor = "#fff";
+                card.style.marginBottom = "10px";
+                card.style.borderRadius = "6px";
+                card.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <strong style="font-size: 18px;">${item.name}</strong>
+                        <div style="color: #666; margin-top: 4px;">Price: ₹${item.price}</div>
+                    </div>
+                    <button onclick="removeItem(${index})" style="background-color: #ff4d4d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Remove ❌</button>
+                `;
+                container.appendChild(card);
+            });
+
+            totalPriceEl.innerText = total;
+            summary.style.display = "block";
         }
 
         function removeItem(index) {
-            items.splice(index, 1);
-            localStorage.setItem("cart", JSON.stringify(items));
-            displayCart();
+            cart.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            renderCart();
         }
 
         function clearCart() {
-            items = [];
-            localStorage.removeItem("cart");
-            displayCart();
-        }
-
-        function goBack() {
-            window.location.href = "products.html";
-        }
-
-        function goToCheckout() {
-            if (items.length === 0) {
-                alert("Your cart is empty! Add some products first.");
-            } else {
-                window.location.href = "checkout.html";
+            if (confirm("Are you sure you want to clear your cart?")) {
+                cart = [];
+                localStorage.setItem("cart", JSON.stringify(cart));
+                renderCart();
             }
         }
 
-        displayCart();
+        function checkout() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            alert("Order placed successfully! Thank you for shopping with KaniMart 🎉");
+            cart = [];
+            localStorage.setItem("cart", JSON.stringify(cart));
+            window.location.href = "products.html";
+        }
+
+        renderCart();
     </script>
 </body>
 </html>
