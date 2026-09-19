@@ -21,13 +21,43 @@
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
         document.getElementById("cartCount").innerText = cart.length;
 
-        // Default products if backend server is not running
+        // Default products with image paths & fallback URLs
         const defaultProducts = [
-            { id: 1, name: "Laptop", price: 45000, stock: 10 },
-            { id: 2, name: "Mobile Phone", price: 18000, stock: 15 },
-            { id: 3, name: "Headphones", price: 2000, stock: 25 },
-            { id: 4, name: "Bread", price: 40, stock: 30 },
-            { id: 5, name: "Butter 500g", price: 250, stock: 20 }
+            { 
+                id: 1, 
+                name: "Laptop", 
+                price: 45000, 
+                stock: 10, 
+                image: "images/laptop.jpg" 
+            },
+            { 
+                id: 2, 
+                name: "Mobile Phone", 
+                price: 18000, 
+                stock: 15, 
+                image: "images/mobile.jpg" 
+            },
+            { 
+                id: 3, 
+                name: "Headphones", 
+                price: 2000, 
+                stock: 25, 
+                image: "images/headphones.jpg" 
+            },
+            { 
+                id: 4, 
+                name: "Bread", 
+                price: 40, 
+                stock: 30, 
+                image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300" 
+            },
+            { 
+                id: 5, 
+                name: "Butter 500g", 
+                price: 250, 
+                stock: 20, 
+                image: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=300" 
+            }
         ];
 
         async function loadProducts() {
@@ -41,7 +71,6 @@
                     renderProducts(defaultProducts);
                 }
             } catch (error) {
-                // If C++ Server is offline, show default products smoothly
                 console.log("C++ Backend offline. Loading default items.");
                 renderProducts(defaultProducts);
             }
@@ -57,11 +86,17 @@
                 card.style.padding = "15px";
                 card.style.borderRadius = "8px";
                 card.style.width = "200px";
+                card.style.textAlign = "center";
+                card.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+
+                // Default image if missing in backend data
+                let imgSrc = product.image || "https://via.placeholder.com/150";
 
                 card.innerHTML = `
+                    <img src="${imgSrc}" alt="${product.name}" style="width: 100%; height: 140px; object-fit: cover; border-radius: 5px; margin-bottom: 10px;">
                     <h3>${product.name}</h3>
                     <p><strong>Price:</strong> ₹${product.price}</p>
-                    <button onclick="addToCart('${product.name}', ${product.price})">Add to Cart 🛒</button>
+                    <button onclick="addToCart('${product.name}', ${product.price})" style="padding: 8px 12px; background-color: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">Add to Cart 🛒</button>
                 `;
                 container.appendChild(card);
             });
