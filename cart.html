@@ -5,12 +5,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header style="background-color: #232f3e; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="margin: 0; font-size: 24px;">🛒 KaniMart Cart</h1>
-        <div>
+    <header style="background-color: #232f3e; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="margin: 0; font-size: 24px; color: white;">🛒 KaniMart Cart</h1>
+        <nav>
             <a href="products.html" style="color: white; text-decoration: none; font-weight: bold; margin-right: 15px;">🛍️ Continue Shopping</a>
             <a href="login.html" style="color: #ff9800; text-decoration: none; font-weight: bold;">Logout</a>
-        </div>
+        </nav>
     </header>
 
     <main style="max-width: 800px; margin: 30px auto; padding: 0 20px;">
@@ -21,8 +21,38 @@
 
         <div id="cartSummary" style="margin-top: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; display: none;">
             <h3>Total Amount: ₹<span id="totalPrice">0</span></h3>
-            <button onclick="checkout()" style="padding: 12px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">Proceed to Checkout 🚀</button>
-            <button onclick="clearCart()" style="padding: 12px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-left: 10px;">Clear Cart 🗑️</button>
+            <div style="margin-top: 15px;">
+                <button onclick="showCheckoutForm()" style="padding: 12px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold;">Proceed to Checkout 🚀</button>
+                <button onclick="clearCart()" style="padding: 12px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-left: 10px;">Clear Cart 🗑️</button>
+            </div>
+        </div>
+
+        <!-- User Details Form Section -->
+        <div id="checkoutFormContainer" style="margin-top: 25px; padding: 20px; background-color: #ffffff; border-radius: 8px; border: 1px solid #232f3e; display: none;">
+            <h3 style="margin-bottom: 15px;">📋 Shipping & Payment Details</h3>
+            <form id="checkoutForm" onsubmit="processOrder(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Full Name:</label>
+                    <input type="text" id="custName" required placeholder="Enter your full name" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Phone Number:</label>
+                    <input type="tel" id="custPhone" required placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Delivery Address:</label>
+                    <textarea id="custAddress" required placeholder="Enter full delivery address" rows="3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;"></textarea>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Payment Method:</label>
+                    <select id="paymentMethod" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+                        <option value="UPI / GPay">UPI / Google Pay</option>
+                        <option value="Credit / Debit Card">Credit / Debit Card</option>
+                    </select>
+                </div>
+                <button type="submit" style="width: 100%; padding: 12px; background-color: #ff9800; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">Confirm & Place Order 🎉</button>
+            </form>
         </div>
     </main>
 
@@ -33,10 +63,12 @@
             let container = document.getElementById("cartItemsContainer");
             let summary = document.getElementById("cartSummary");
             let totalPriceEl = document.getElementById("totalPrice");
+            let checkoutForm = document.getElementById("checkoutFormContainer");
 
             if (cart.length === 0) {
                 container.innerHTML = "<p>Your cart is empty! <a href='products.html'>Add some items</a>.</p>";
                 summary.style.display = "none";
+                checkoutForm.style.display = "none";
                 return;
             }
 
@@ -47,7 +79,7 @@
                 total += item.price;
                 let card = document.createElement("div");
                 card.style.display = "flex";
-                card.style.justifySpaceBetween = "space-between";
+                card.style.justifyContent = "space-between";
                 card.style.alignItems = "center";
                 card.style.padding = "12px 15px";
                 card.style.borderBottom = "1px solid #eee";
@@ -84,12 +116,25 @@
             }
         }
 
-        function checkout() {
+        function showCheckoutForm() {
             if (cart.length === 0) {
                 alert("Your cart is empty!");
                 return;
             }
-            alert("Order placed successfully! Thank you for shopping with KaniMart 🎉");
+            document.getElementById("checkoutFormContainer").style.display = "block";
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function processOrder(event) {
+            event.preventDefault();
+            
+            let name = document.getElementById("custName").value;
+            let phone = document.getElementById("custPhone").value;
+            let address = document.getElementById("custAddress").value;
+            let payment = document.getElementById("paymentMethod").value;
+
+            alert(`Thank you ${name}! 🎉\n\nYour order has been placed successfully via ${payment}.\nDelivery Address: ${address}`);
+
             cart = [];
             localStorage.setItem("cart", JSON.stringify(cart));
             window.location.href = "products.html";
